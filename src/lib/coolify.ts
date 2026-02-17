@@ -26,7 +26,7 @@ async function coolifyFetch<T>(endpoint: string): Promise<T> {
       Authorization: `Bearer ${COOLIFY_API_TOKEN}`,
       Accept: "application/json",
     },
-    next: { revalidate: 60 },
+    cache: "no-store",
   });
 
   if (!res.ok) {
