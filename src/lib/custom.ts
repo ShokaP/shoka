@@ -1,8 +1,4 @@
-import { promises as fs } from "fs";
-import path from "path";
-import crypto from "crypto";
-
-const CUSTOM_FILE = path.join(process.cwd(), "data", "custom.json");
+import { supabase } from "./supabase";
 
 export interface CustomProject {
   id: string;
@@ -14,44 +10,45 @@ export interface CustomProject {
 }
 
 export async function getCustomProjects(): Promise<CustomProject[]> {
-  try {
-    const data = await fs.readFile(CUSTOM_FILE, "utf-8");
-    return JSON.parse(data);
-  } catch {
+  const { data, error } = await supabase
+    .from("custom_projects")
+    .select("*")
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    console.error("Failed to fetch custom projects:", error);
     return [];
   }
+
+  return data as CustomProject[];
 }
 
 export async function addCustomProject(
   project: Omit<CustomProject, "id" | "created_at">
 ): Promise<CustomProject> {
-  const projects = await getCustomProjects();
-  const newProject: CustomProject = {
-    ...project,
-    id: crypto.randomUUID(),
-    created_at: new Date().toISOString(),
-  };
-  projects.push(newProject);
-  await fs.writeFile(CUSTOM_FILE, JSON.stringify(projects, null, 2), "utf-8");
-  return newProject;
+  const { data, error } = await supabase
+    .from("custom_projects")
+    .insert(project)
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(`Failed to add custom project: ${error.message}`);
+  }
+
+  return data as CustomProject;
 }
 
 export async function deleteCustomProject(id: string): Promise<boolean> {
-  const projects = await getCustomProjects();
-  const filtered = projects.filter((p) => p.id !== id);
-  if (filtered.length === projects.length) return false;
-  await fs.writeFile(CUSTOM_FILE, JSON.stringify(filtered, null, 2), "utf-8");
-  return true;
-}
+  const { error } = await supabase
+    .from("custom_projects")
+    .delete()
+    .eq("id", id);
 
-export async function updateCustomProject(
-  id: string,
-  updates: Partial<Omit<CustomProject, "id" | "created_at">>
-): Promise<CustomProject | null> {
-  const projects = await getCustomProjects();
-  const index = projects.findIndex((p) => p.id === id);
-  if (index === -1) return null;
-  projects[index] = { ...projects[index], ...updates };
-  await fs.writeFile(CUSTOM_FILE, JSON.stringify(projects, null, 2), "utf-8");
-  return projects[index];
+  if (error) {
+    console.error("Failed to delete custom project:", error);
+    return false;
+  }
+
+  return true;
 }

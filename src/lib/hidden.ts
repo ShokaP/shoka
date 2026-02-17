@@ -1,32 +1,30 @@
-import { promises as fs } from "fs";
-import path from "path";
-
-const HIDDEN_FILE = path.join(process.cwd(), "data", "hidden.json");
+import { supabase } from "./supabase";
 
 export async function getHiddenIds(): Promise<string[]> {
-  try {
-    const data = await fs.readFile(HIDDEN_FILE, "utf-8");
-    return JSON.parse(data);
-  } catch {
+  const { data, error } = await supabase
+    .from("hidden_projects")
+    .select("uuid");
+
+  if (error) {
+    console.error("Failed to fetch hidden IDs:", error);
     return [];
   }
-}
 
-export async function setHiddenIds(ids: string[]): Promise<void> {
-  await fs.writeFile(HIDDEN_FILE, JSON.stringify(ids, null, 2), "utf-8");
+  return data.map((row) => row.uuid);
 }
 
 export async function toggleHidden(uuid: string): Promise<boolean> {
-  const ids = await getHiddenIds();
-  const index = ids.indexOf(uuid);
+  const { data: existing } = await supabase
+    .from("hidden_projects")
+    .select("id")
+    .eq("uuid", uuid)
+    .single();
 
-  if (index === -1) {
-    ids.push(uuid);
-    await setHiddenIds(ids);
-    return true; // now hidden
-  } else {
-    ids.splice(index, 1);
-    await setHiddenIds(ids);
+  if (existing) {
+    await supabase.from("hidden_projects").delete().eq("uuid", uuid);
     return false; // now visible
+  } else {
+    await supabase.from("hidden_projects").insert({ uuid });
+    return true; // now hidden
   }
 }
