@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { getSupabase } from "./supabase";
 
 export interface CustomProject {
   id: string;
@@ -10,6 +10,7 @@ export interface CustomProject {
 }
 
 export async function getCustomProjects(): Promise<CustomProject[]> {
+  const supabase = getSupabase();
   const { data, error } = await supabase
     .from("custom_projects")
     .select("*")
@@ -26,6 +27,7 @@ export async function getCustomProjects(): Promise<CustomProject[]> {
 export async function addCustomProject(
   project: Omit<CustomProject, "id" | "created_at">
 ): Promise<CustomProject> {
+  const supabase = getSupabase();
   const { data, error } = await supabase
     .from("custom_projects")
     .insert(project)
@@ -40,6 +42,7 @@ export async function addCustomProject(
 }
 
 export async function deleteCustomProject(id: string): Promise<boolean> {
+  const supabase = getSupabase();
   const { error } = await supabase
     .from("custom_projects")
     .delete()

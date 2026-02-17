@@ -1,6 +1,7 @@
-import { supabase } from "./supabase";
+import { getSupabase } from "./supabase";
 
 export async function getHiddenIds(): Promise<string[]> {
+  const supabase = getSupabase();
   const { data, error } = await supabase
     .from("hidden_projects")
     .select("uuid");
@@ -14,6 +15,7 @@ export async function getHiddenIds(): Promise<string[]> {
 }
 
 export async function toggleHidden(uuid: string): Promise<boolean> {
+  const supabase = getSupabase();
   const { data: existing } = await supabase
     .from("hidden_projects")
     .select("id")
