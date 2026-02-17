@@ -1,4 +1,5 @@
 import { ProjectCard } from "@/components/ProjectCard";
+import { HeroTitle } from "@/components/HeroTitle";
 import { getApplications, CoolifyApplication } from "@/lib/coolify";
 import { getHiddenIds } from "@/lib/hidden";
 
@@ -20,15 +21,7 @@ export default async function Home() {
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-16">
-      <div className="mb-12 text-center">
-        <h1 className="mb-3 text-4xl font-bold tracking-tight text-white sm:text-5xl">
-          My Projects
-        </h1>
-        <p className="text-lg text-gray-400">
-          Self-hosted applications powered by{" "}
-          <span className="text-shimmer font-semibold">Shoka</span>
-        </p>
-      </div>
+      <HeroTitle />
 
       {error ? (
         <div className="mx-auto max-w-md rounded-xl border border-red-500/30 bg-red-500/10 p-6 text-center">
