@@ -1,5 +1,5 @@
-import { ProjectCard } from "@/components/ProjectCard";
 import { HeroTitle } from "@/components/HeroTitle";
+import { ProjectGrid } from "@/components/ProjectGrid";
 import { getApplications, CoolifyApplication } from "@/lib/coolify";
 import { getHiddenIds } from "@/lib/hidden";
 
@@ -38,11 +38,7 @@ export default async function Home() {
           <p className="text-gray-500">No projects to show</p>
         </div>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {projects.map((project) => (
-            <ProjectCard key={project.uuid} project={project} />
-          ))}
-        </div>
+        <ProjectGrid projects={projects} />
       )}
     </div>
   );
