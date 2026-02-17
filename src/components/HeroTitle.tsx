@@ -5,14 +5,16 @@ import { useEffect, useState } from "react";
 function AnimatedLetter({
   char,
   delay,
+  isShimmer,
 }: {
   char: string;
   delay: number;
+  isShimmer?: boolean;
 }) {
-  const [visible, setVisible] = useState(false);
+  const [revealed, setRevealed] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setVisible(true), delay);
+    const timer = setTimeout(() => setRevealed(true), delay);
     return () => clearTimeout(timer);
   }, [delay]);
 
@@ -22,12 +24,15 @@ function AnimatedLetter({
 
   return (
     <span
-      className={`hero-letter inline-block transition-all duration-500 ${
-        visible
-          ? "opacity-100 translate-y-0 blur-0"
-          : "opacity-0 translate-y-4 blur-sm"
+      className={`hero-letter inline-block transition-all duration-700 ease-out ${
+        isShimmer ? "text-shimmer-inline font-semibold" : ""
       }`}
-      style={{ transitionDelay: `${delay}ms` }}
+      style={{
+        filter: revealed ? "blur(0px)" : "blur(8px)",
+        opacity: revealed ? 1 : 0.15,
+        transform: revealed ? "scale(1)" : "scale(0.9)",
+        transition: `filter 0.7s ease-out ${delay}ms, opacity 0.7s ease-out ${delay}ms, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)`,
+      }}
     >
       {char}
     </span>
@@ -39,11 +44,21 @@ export function HeroTitle() {
   const subtitle = "Self-hosted applications powered by ";
   const brand = "Shoka";
 
+  const titleDelay = 80;
+  const subtitleStart = title.length * titleDelay + 200;
+  const subtitleDelay = 25;
+  const brandStart = subtitleStart + subtitle.length * subtitleDelay + 100;
+  const brandDelay = 100;
+
   return (
     <div className="mb-12 text-center">
       <h1 className="mb-3 text-4xl font-bold tracking-tight text-white sm:text-5xl">
         {title.split("").map((char, i) => (
-          <AnimatedLetter key={`t-${i}`} char={char} delay={i * 60} />
+          <AnimatedLetter
+            key={`t-${i}`}
+            char={char}
+            delay={i * titleDelay}
+          />
         ))}
       </h1>
       <p className="text-lg text-gray-400">
@@ -51,20 +66,16 @@ export function HeroTitle() {
           <AnimatedLetter
             key={`s-${i}`}
             char={char}
-            delay={title.length * 60 + i * 30}
+            delay={subtitleStart + i * subtitleDelay}
           />
         ))}
         {brand.split("").map((char, i) => (
-          <span
+          <AnimatedLetter
             key={`b-${i}`}
-            className="hero-letter text-shimmer-inline inline-block font-semibold opacity-0 translate-y-4 blur-sm animate-fade-up"
-            style={{
-              animationDelay: `${title.length * 60 + subtitle.length * 30 + i * 80}ms`,
-              animationFillMode: "forwards",
-            }}
-          >
-            {char}
-          </span>
+            char={char}
+            delay={brandStart + i * brandDelay}
+            isShimmer
+          />
         ))}
       </p>
     </div>
