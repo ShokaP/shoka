@@ -25,7 +25,8 @@ export default async function Home() {
           My Projects
         </h1>
         <p className="text-lg text-gray-400">
-          Self-hosted applications powered by Coolify
+          Self-hosted applications powered by{" "}
+          <span className="text-shimmer font-semibold">Shoka</span>
         </p>
       </div>
 

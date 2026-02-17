@@ -31,4 +31,29 @@
   .card-shine:hover::before {
     left: 100%;
   }
+
+  .text-shimmer {
+    background: linear-gradient(
+      90deg,
+      #6366f1 0%,
+      #a78bfa 25%,
+      #f0abfc 50%,
+      #a78bfa 75%,
+      #6366f1 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 3s linear infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: 0% center;
+    }
+    100% {
+      background-position: 200% center;
+    }
+  }
 }
